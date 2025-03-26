@@ -1,0 +1,4 @@
+Flask
+Flask-Cors
+chatterbot==1.0.5
+chatterbot_corpus

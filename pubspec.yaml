@@ -1,0 +1,29 @@
+name: ZenBot
+description: "A new Flutter project."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^0.13.5
+# Add other dependencies here if needed
+
+dev_dependencies:   # Make sure this is outside the `flutter` section
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: ^0.13.1
+
+flutter_icons:  # This should also be outside the `flutter` section
+  android: true
+  ios: true
+  image_path: "web/icons/Icon-192.png"  # Replace with your actual icon path
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/bot.jpg
