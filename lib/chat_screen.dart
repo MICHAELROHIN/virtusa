@@ -95,7 +95,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            messages[index]["sender"] == "user" ? "You" : "Bot",
+                            messages[index]["sender"] == "user" ? "You" : "ZenBot",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: messages[index]["sender"] == "user"
