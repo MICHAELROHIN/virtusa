@@ -9,6 +9,7 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();  // ScrollController
   List<Map<String, String>> messages = [];
   bool _isLoading = false;
 
@@ -43,6 +44,18 @@ class _ChatScreenState extends State<ChatScreen> {
       setState(() {
         _isLoading = false; // Hide loading indicator
       });
+      _scrollToBottom();  // Scroll to the bottom after sending the message
+    }
+  }
+
+  // This function makes sure to scroll to the bottom
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
     }
   }
 
@@ -59,8 +72,10 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         child: Column(
           children: [
+            // This is the ListView that will be scrollable
             Expanded(
               child: ListView.builder(
+                controller: _scrollController,  // Use the ScrollController here
                 itemCount: messages.length,
                 itemBuilder: (context, index) {
                   return Align(
@@ -104,7 +119,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 },
               ),
             ),
-            if (_isLoading) CircularProgressIndicator(), // Show loading indicator
+            // Show loading indicator if needed
+            if (_isLoading) CircularProgressIndicator(),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
