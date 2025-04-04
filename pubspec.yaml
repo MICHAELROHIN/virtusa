@@ -10,6 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^0.13.5
+  image_picker: ^1.0.4
+
 # Add other dependencies here if needed
 
 dev_dependencies:   # Make sure this is outside the `flutter` section
@@ -24,6 +26,12 @@ flutter_icons:  # This should also be outside the `flutter` section
 
 flutter:
   uses-material-design: true
+  fonts:
+    - family: Cormorant
+      fonts:
+        - asset: assets/fonts/Cormorant/Cormorant-Italic-VariableFont_wght.ttf
 
   assets:
     - assets/bot.jpg
+    - assets/logo.png
+
