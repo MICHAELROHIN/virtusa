@@ -11,8 +11,10 @@ dependencies:
     sdk: flutter
   http: ^0.13.5
   image_picker: ^1.0.4
-  provider: ^6.1.0
-
+  firebase_auth: ^4.7.2
+  google_sign_in: ^6.1.5
+  firebase_core: ^2.25.4
+  provider: ^6.1.1
 
 # Add other dependencies here if needed
 
@@ -36,4 +38,5 @@ flutter:
   assets:
     - assets/bot.jpg
     - assets/logo.png
+    - assets/google_icon.png
 
