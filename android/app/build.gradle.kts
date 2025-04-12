@@ -10,7 +10,8 @@ android {
     namespace = "com.example.projects1"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
- // ndkVersion = "27.0.12077973"
+    ndkVersion = "27.0.12077973"
+
 
 
     compileOptions {

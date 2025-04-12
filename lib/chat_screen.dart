@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
+import 'main.dart';
 
-
-import 'main.dart';class ChatScreen extends StatefulWidget {
+class ChatScreen extends StatefulWidget {
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
@@ -84,7 +85,6 @@ class _ChatScreenState extends State<ChatScreen> {
     Color userBg = Colors.blue.withOpacity(0.8);
     Color userText = Colors.white;
 
-    // ⬇️ Faded black for dark mode, clean white for light mode
     Color botBg = isDark ? Colors.black.withOpacity(0.7) : Colors.white.withOpacity(0.9);
     Color botText = isDark ? Colors.white : Colors.black;
 
@@ -142,7 +142,6 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -188,6 +187,55 @@ class _ChatScreenState extends State<ChatScreen> {
               Provider.of<ThemeProvider>(context, listen: false).toggleTheme(value);
             },
             activeColor: Colors.white,
+          ),
+          SizedBox(width: 8),
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: PopupMenuButton<String>(
+              icon: FirebaseAuth.instance.currentUser?.photoURL != null
+                  ? CircleAvatar(
+                backgroundImage: NetworkImage(FirebaseAuth.instance.currentUser!.photoURL!),
+              )
+                  : CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Text(
+                  FirebaseAuth.instance.currentUser?.email?[0].toUpperCase() ?? "?",
+                  style: TextStyle(color: Colors.black),
+                ),
+              ),
+              onSelected: (value) {
+                if (value == 'logout') {
+                  FirebaseAuth.instance.signOut();
+                  Navigator.of(context).pushReplacementNamed('/');
+                } else if (value == 'settings') {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Settings tapped")),
+                  );
+                }
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'settings',
+                  child: Row(
+                    children: [
+                      Icon(Icons.settings, color: Colors.white),
+                      SizedBox(width: 10),
+                      Text('Settings'),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'logout',
+                  child: Row(
+                    children: [
+                      Icon(Icons.logout, color: Colors.white),
+                      SizedBox(width: 10),
+                      Text('Logout'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
