@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import 'main.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -181,20 +180,14 @@ class _ChatScreenState extends State<ChatScreen> {
               });
             },
           ),
-          Switch(
-            value: Provider.of<ThemeProvider>(context).isDarkMode,
-            onChanged: (value) {
-              Provider.of<ThemeProvider>(context, listen: false).toggleTheme(value);
-            },
-            activeColor: Colors.white,
-          ),
           SizedBox(width: 8),
           Padding(
             padding: const EdgeInsets.only(right: 10),
             child: PopupMenuButton<String>(
               icon: FirebaseAuth.instance.currentUser?.photoURL != null
                   ? CircleAvatar(
-                backgroundImage: NetworkImage(FirebaseAuth.instance.currentUser!.photoURL!),
+                backgroundImage:
+                NetworkImage(FirebaseAuth.instance.currentUser!.photoURL!),
               )
                   : CircleAvatar(
                 backgroundColor: Colors.white,
@@ -208,8 +201,50 @@ class _ChatScreenState extends State<ChatScreen> {
                   FirebaseAuth.instance.signOut();
                   Navigator.of(context).pushReplacementNamed('/');
                 } else if (value == 'settings') {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Settings tapped")),
+                  showModalBottomSheet(
+                    context: context,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    builder: (context) {
+                      bool isDarkMode = Provider.of<ThemeProvider>(context, listen: false).isDarkMode;
+                      return Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(Icons.settings, color: Colors.black),
+                                SizedBox(width: 10),
+                                Text(
+                                  'Settings',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Divider(thickness: 1, height: 20),
+                            ListTile(
+                              leading: Icon(Icons.brightness_6),
+                              title: Text('Dark Mode'),
+                              trailing: Consumer<ThemeProvider>(
+                                builder: (context, themeProvider, _) => Switch(
+                                  value: themeProvider.isDarkMode,
+                                  onChanged: (value) {
+                                    themeProvider.toggleTheme(value);
+                                  },
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                          ],
+                        ),
+                      );
+                    },
                   );
                 }
               },
@@ -218,7 +253,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   value: 'settings',
                   child: Row(
                     children: [
-                      Icon(Icons.settings, color: Colors.white),
+                      Icon(Icons.settings, color: Colors.black),
                       SizedBox(width: 10),
                       Text('Settings'),
                     ],
@@ -228,7 +263,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   value: 'logout',
                   child: Row(
                     children: [
-                      Icon(Icons.logout, color: Colors.white),
+                      Icon(Icons.logout, color: Colors.black),
                       SizedBox(width: 10),
                       Text('Logout'),
                     ],
