@@ -81,10 +81,10 @@ class _ChatScreenState extends State<ChatScreen> {
     bool isUser = message["sender"] == "user";
     bool isDark = Theme.of(context).brightness == Brightness.dark;
 
-    Color userBg = Colors.blue.withOpacity(0.8);
-    Color userText = Colors.white;
+    Color userBg = isDark ? Colors.blue.withOpacity(0.8) : Colors.blue.shade100;
+    Color userText = isDark ? Colors.white : Colors.black;
 
-    Color botBg = isDark ? Colors.black.withOpacity(0.7) : Colors.white.withOpacity(0.9);
+    Color botBg = isDark ? Colors.black.withOpacity(0.7) : Colors.grey.shade200;
     Color botText = isDark ? Colors.white : Colors.black;
 
     return Column(
@@ -349,10 +349,18 @@ class _ChatScreenState extends State<ChatScreen> {
                       Expanded(
                         child: TextField(
                           controller: _controller,
+                          style: TextStyle(
+                            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
+                          ),
                           decoration: InputDecoration(
                             labelText: "Enter message",
+                            labelStyle: TextStyle(
+                              color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black54,
+                            ),
                             filled: true,
-                            fillColor: Colors.white.withOpacity(0.8),
+                            fillColor: Theme.of(context).brightness == Brightness.dark
+                                ? Colors.grey[800]
+                                : Colors.white.withOpacity(0.8),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
