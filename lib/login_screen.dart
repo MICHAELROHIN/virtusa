@@ -17,19 +17,13 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final email = _emailController.text.trim();
       final password = _passwordController.text;
-
-      print("Attempting login with:");
-      print("Email: $email");
-      print("Password: $password");
-
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
       _navigateToChat();
     } catch (e) {
-      print("Login error: $e");
-      _showError(e.toString());
+      _showError("Login error: $e");
     }
   }
 
@@ -43,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       _navigateToChat();
     } catch (e) {
-      _showError(e.toString());
+      _showError("Registration error: $e");
     } finally {
       setState(() => _isLoading = false);
     }
@@ -52,9 +46,18 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _signInWithGoogle() async {
     FocusScope.of(context).unfocus();
     setState(() => _isLoading = true);
+
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+      if (googleUser == null) {
+        _showError("Google sign-in aborted");
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+      await googleUser.authentication;
 
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
@@ -109,7 +112,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     hintText: "Email",
                     filled: true,
                     fillColor: Colors.white,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
                 SizedBox(height: 10),
@@ -121,7 +126,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     hintText: "Password",
                     filled: true,
                     fillColor: Colors.white,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
                 SizedBox(height: 20),
@@ -133,7 +140,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: _signInWithEmail,
                       child: Text("Login with Email"),
                       style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 30, vertical: 12),
                         backgroundColor: Colors.teal,
                       ),
                     ),
@@ -147,16 +155,22 @@ class _LoginScreenState extends State<LoginScreen> {
                     Divider(color: Colors.white),
                     ElevatedButton.icon(
                       onPressed: _signInWithGoogle,
-                      icon: Image.asset(
-                        'assets/google_icon.png', // Make sure to add this image
-                        height: 24,
+                      icon: ClipOval(
+                        child: Image.asset(
+                          'assets/google_icon.png',
+                          height: 24,
+                          width: 24,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                       label: Text("Sign in with Google"),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         foregroundColor: Colors.black,
-                        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                        textStyle: TextStyle(fontWeight: FontWeight.bold),
+                        padding: EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 20),
+                        textStyle:
+                        TextStyle(fontWeight: FontWeight.bold),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),

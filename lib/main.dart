@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 
+import 'splash_screen.dart';      // Make sure this file exists
 import 'chat_screen.dart';
 import 'login_screen.dart';
 
@@ -47,31 +48,7 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: Colors.grey[900],
       ),
-      home: const AuthWrapper(),
-    );
-  }
-}
-
-class AuthWrapper extends StatelessWidget {
-  const AuthWrapper({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-
-        if (snapshot.hasData) {
-          return ChatScreen();
-        } else {
-          return LoginScreen();
-        }
-      },
+      home: const SplashScreen(), // Set splash screen as initial
     );
   }
 }

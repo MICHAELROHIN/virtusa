@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChatScreen extends StatefulWidget {
   @override
@@ -16,11 +17,38 @@ class _ChatScreenState extends State<ChatScreen> {
   List<Map<String, String>> messages = [];
   bool _isLoading = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _loadMessages();
+  }
+
+  Future<void> _loadMessages() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedMessages = prefs.getStringList('chat_messages') ?? [];
+    setState(() {
+      messages = savedMessages.map((msg) {
+        final decoded = jsonDecode(msg);
+        return {
+          "sender": decoded['sender'].toString(),
+          "text": decoded['text'].toString(),
+        };
+      }).toList();
+    });
+  }
+
+  Future<void> _saveMessages() async {
+    final prefs = await SharedPreferences.getInstance();
+    final msgList = messages.map((msg) => jsonEncode(msg)).toList();
+    await prefs.setStringList('chat_messages', msgList);
+  }
+
   void sendMessage(String message) async {
     setState(() {
       messages.add({"sender": "user", "text": message});
       _isLoading = true;
     });
+    await _saveMessages();
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
 
     try {
@@ -36,15 +64,18 @@ class _ChatScreenState extends State<ChatScreen> {
         setState(() {
           messages.add({"sender": "bot", "text": data["response"]});
         });
+        _saveMessages();
       } else {
         setState(() {
           messages.add({"sender": "bot", "text": "Error: Unable to get response!"});
         });
+        _saveMessages();
       }
     } catch (e) {
       setState(() {
         messages.add({"sender": "bot", "text": "Error: Failed to connect to the server!"});
       });
+      _saveMessages();
     } finally {
       setState(() {
         _isLoading = false;
@@ -88,16 +119,14 @@ class _ChatScreenState extends State<ChatScreen> {
     Color botText = isDark ? Colors.white : Colors.black;
 
     return Column(
-      crossAxisAlignment:
-      isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
         Align(
           alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(
             margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
             padding: EdgeInsets.all(10),
-            constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.7),
+            constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
             decoration: BoxDecoration(
               color: isUser ? userBg : botBg,
               borderRadius: BorderRadius.only(
@@ -112,18 +141,10 @@ class _ChatScreenState extends State<ChatScreen> {
               children: [
                 Text(
                   isUser ? "You" : "ZenBot",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: isUser ? userText : botText,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: isUser ? userText : botText),
                 ),
                 SizedBox(height: 5),
-                Text(
-                  message["text"]!,
-                  style: TextStyle(
-                    color: isUser ? userText : botText,
-                  ),
-                ),
+                Text(message["text"]!, style: TextStyle(color: isUser ? userText : botText)),
               ],
             ),
           ),
@@ -146,7 +167,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.black.withOpacity(0.5),
         elevation: 0,
         titleSpacing: 0,
         title: Padding(
@@ -154,7 +175,7 @@ class _ChatScreenState extends State<ChatScreen> {
           child: Row(
             children: [
               CircleAvatar(
-                backgroundImage: AssetImage('assets/logo.png'),
+                backgroundImage: AssetImage("assets/logo.png"),
                 radius: 28,
                 backgroundColor: Colors.transparent,
               ),
@@ -178,6 +199,7 @@ class _ChatScreenState extends State<ChatScreen> {
               setState(() {
                 messages.clear();
               });
+              _saveMessages();
             },
           ),
           SizedBox(width: 8),
@@ -186,8 +208,7 @@ class _ChatScreenState extends State<ChatScreen> {
             child: PopupMenuButton<String>(
               icon: FirebaseAuth.instance.currentUser?.photoURL != null
                   ? CircleAvatar(
-                backgroundImage:
-                NetworkImage(FirebaseAuth.instance.currentUser!.photoURL!),
+                backgroundImage: NetworkImage(FirebaseAuth.instance.currentUser!.photoURL!),
               )
                   : CircleAvatar(
                 backgroundColor: Colors.white,
@@ -220,10 +241,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 SizedBox(width: 10),
                                 Text(
                                   'Settings',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                                 ),
                               ],
                             ),
@@ -240,7 +258,6 @@ class _ChatScreenState extends State<ChatScreen> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 10),
                           ],
                         ),
                       );
@@ -271,16 +288,14 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ],
             ),
+
           ),
         ],
       ),
       body: Stack(
         children: [
           Positioned.fill(
-            child: Image.asset(
-              "assets/bot.jpg",
-              fit: BoxFit.cover,
-            ),
+            child: Image.asset("assets/bot.jpg", fit: BoxFit.cover),
           ),
           SafeArea(
             child: Column(
@@ -295,8 +310,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         return Align(
                           alignment: Alignment.centerLeft,
                           child: Container(
-                            margin: EdgeInsets.symmetric(
-                                vertical: 5, horizontal: 10),
+                            margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                             padding: EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.8),
@@ -307,8 +321,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 SizedBox(
                                   width: 20,
                                   height: 20,
-                                  child: CircularProgressIndicator(
-                                      strokeWidth: 2),
+                                  child: CircularProgressIndicator(strokeWidth: 2),
                                 ),
                                 SizedBox(width: 10),
                                 Text("ZenBot is typing..."),
